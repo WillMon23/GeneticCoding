@@ -1,0 +1,13 @@
+{
+	"FileVersion": 3,
+	"EngineAssociation": "{088D6A62-431F-8D3F-0329-DB90EFEFCE69}",
+	"Category": "",
+	"Description": "",
+	"Modules": [
+		{
+			"Name": "GeneticCoding",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	]
+}
