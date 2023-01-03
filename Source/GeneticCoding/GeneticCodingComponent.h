@@ -7,6 +7,8 @@
 #include "TraitInfo.h"
 #include "GeneticCodingComponent.generated.h"
 
+class AGeneticCodingActor;
+
 struct Allies {
 	bool alliesOne = false;
 	bool alliesTwo = false;
@@ -28,7 +30,7 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	void SpawnObject(FVector location, FRotator rotation);
+	AGeneticCodingActor* SpawnObject(FVector location, FRotator rotation);
 private:
 	bool CanReproduce();
 	bool CanReproduce(TArray<FTraitInfo> parent);
@@ -46,7 +48,7 @@ public:
 	bool ReadyToReproduce = false;
 
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<AActor> _actorToSpawn;
+	TSubclassOf<AGeneticCodingActor> _actorToSpawn;
 
 	UPROPERTY(EditAnywhere)
 	class UGeneticCodingGameManager* _gameManager;

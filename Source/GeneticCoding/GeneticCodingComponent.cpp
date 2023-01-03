@@ -3,6 +3,7 @@
 
 #include "GeneticCodingComponent.h"
 #include "GeneticCodingGameManager.h"
+#include "GeneticCodingActor.h"
 
 
 // Sets default values for this component's properties
@@ -30,11 +31,14 @@ void UGeneticCodingComponent::TickComponent(float DeltaTime, ELevelTick TickType
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
-void UGeneticCodingComponent::SpawnObject(FVector location, FRotator rotation)
+AGeneticCodingActor* UGeneticCodingComponent::SpawnObject(FVector location, FRotator rotation)
 {
-	FActorSpawnParameters SpawnParams;
-	AActor* SpawnedActorRef = GetWorld()->SpawnActor<AActor>(_actorToSpawn, location, rotation, SpawnParams);
+		FActorSpawnParameters SpawnParams;
+		AGeneticCodingActor* SpawnedActorRef = GetWorld()->SpawnActor<AGeneticCodingActor>(_actorToSpawn, location, rotation, SpawnParams);
+		return SpawnedActorRef;
+	
 }
+
 
 bool UGeneticCodingComponent::CanReproduce()
 {
@@ -93,15 +97,15 @@ void UGeneticCodingComponent::AddToManager()
 }
 void UGeneticCodingComponent::Recreate()
 {
-	FVector Location(0.0f, 0.0f, 0.0f);
+	FVector Location = GetOwner()->GetActorTransform().GetLocation();
 	FRotator Rotation(0.0f, 0.0f, 0.0f);
 	FActorSpawnParameters SpawnInfo;
 
 	FTransform tranform = GetOwner()->GetTransform();
 
-	if (CanReproduce()) {
+	if (CanReproduce() && _actorToSpawn ) {
 
-		AActor* MySpawnActor = GetWorld()->SpawnActor<AActor>(Location, Rotation, SpawnInfo);
+		AGeneticCodingActor* MySpawnActor = SpawnObject(Location, Rotation);
 
 		UGeneticCodingComponent* TransferDNA = NewObject<UGeneticCodingComponent>(MySpawnActor,TEXT("GeneticCoding"));
 
