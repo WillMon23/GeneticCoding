@@ -30,6 +30,12 @@ void UGeneticCodingComponent::TickComponent(float DeltaTime, ELevelTick TickType
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
+void UGeneticCodingComponent::SpawnObject(FVector location, FRotator rotation)
+{
+	FActorSpawnParameters SpawnParams;
+	AActor* SpawnedActorRef = GetWorld()->SpawnActor<AActor>(_actorToSpawn, location, rotation, SpawnParams);
+}
+
 bool UGeneticCodingComponent::CanReproduce()
 {
 	return  CanReproduce(Traits);
