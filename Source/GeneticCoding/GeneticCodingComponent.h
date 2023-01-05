@@ -22,27 +22,45 @@ class GENETICCODING_API UGeneticCodingComponent : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	UGeneticCodingComponent();
-
-protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
-
-public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	
+	/// <summary>
+	/// Spawns the object with a position and a direction/rotation
+	/// </summary>
+	/// <param name="location">Position it spawns in</param>
+	/// <param name="rotation">direction is spawns in</param>
+	/// <returns>New object spawned refrenced from AGeneticCodingActor</returns>
 	AGeneticCodingActor* SpawnObject(FVector location, FRotator rotation);
 private:
+	/// <summary>
+	/// Takes it's self recreates it with a new set of traits inherited by it's own traits 
+	/// based on the trait info provided 
+	/// </summary>
+	/// <returns>returns true If the inheritance passed perfectly</returns>
 	bool CanReproduce();
-	bool CanReproduce(TArray<FTraitInfo> parent);
 
+	/// <summary>
+	/// Takes Takes some other genes then recreates a new set of traits inherited by it's own traits 
+	/// based on the trait info provided
+	/// Then takes the name an attaches To the other 
+	/// </summary>
+	/// <param name="otherGenes">the other gene been contribuatting to the inheritance</param>
+	/// <returns>returns true If the inheritance passed perfectly</returns>
+	bool CanReproduce(UGeneticCodingComponent* otherGenes);
+
+	/// <summary>
+	/// Updates the data asset attached to this component 
+	/// </summary>
 	void AddToManager();
 
 	UFUNCTION(CallInEditor)
+	/// <summary>
+	/// Once ready for recreate it'll spawn a new actor with a new genepool inherited 
+	/// </summary>
 	void Recreate();
 
 public:
 	UPROPERTY(EditAnywhere)
-	TArray<FTraitInfo> Traits;
+	TArray<FTraitInfo> GenePool;
 	
 	UPROPERTY(EditAnywhere)
 	bool ReadyToReproduce = false;
@@ -61,7 +79,7 @@ public:
 
 
 private:
-	TArray<FTraitInfo> _offSpring;
+	UGeneticCodingComponent* _offSpring;
 	AActor* _parent;
 
 	

@@ -14,23 +14,6 @@ UGeneticCodingComponent::UGeneticCodingComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
-
-// Called when the game starts
-void UGeneticCodingComponent::BeginPlay()
-{
-	Super::BeginPlay();
-
-	// ...
-	
-}
-
-
-// Called every frame
-void UGeneticCodingComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-}
-
 AGeneticCodingActor* UGeneticCodingComponent::SpawnObject(FVector location, FRotator rotation)
 {
 		FActorSpawnParameters SpawnParams;
@@ -39,52 +22,56 @@ AGeneticCodingActor* UGeneticCodingComponent::SpawnObject(FVector location, FRot
 	
 }
 
-
 bool UGeneticCodingComponent::CanReproduce()
 {
-	return  CanReproduce(Traits);
+	return  CanReproduce(this);
 }
 
-bool UGeneticCodingComponent::CanReproduce(TArray<FTraitInfo> otherParentGenes)
+bool UGeneticCodingComponent::CanReproduce(UGeneticCodingComponent* otherGenes)
 {
-	//allies, helps with deciding what 
+	//meant to recreate mondelas law of inheritance chart
 	Allies arr[4];
-	Allies winningGen;
+	//Holds the 
+	Allies winningAllies;
 
 	if (!ReadyToReproduce)
 		return false;
 
-	_offSpring.SetNum(Traits.Num());
+	_offSpring = NewObject<UGeneticCodingComponent>();
 
-	for (int j = 0; j < Traits.Num(); j++) {
+	_offSpring->GenePool.SetNum(GenePool.Num());
 
-		if (Traits[j].TraitsName != otherParentGenes[j].TraitsName)
+	for (int j = 0; j < GenePool.Num(); j++) {
+
+		if (GenePool[j].TraitsName != otherGenes->GenePool[j].TraitsName)
 		{
-			_offSpring[j] = Traits[j];
+			_offSpring->GenePool[j] = GenePool[j];
 			continue;
 		}
-		Traits[j].Value = Traits[j].GetValue();
-
-		_offSpring[j] = Traits[j];
+		_offSpring->GenePool[j] = GenePool[j];
 		
-		arr[0].alliesOne = Traits[j].IsDominateTraitOne;            arr[1].alliesOne = Traits[j].IsDominateTraitTwo;
-		arr[0].alliesTwo = otherParentGenes[j].IsDominateTraitOne;  arr[1].alliesTwo = otherParentGenes[j].IsDominateTraitOne;
+
+
+		arr[0].alliesOne = GenePool[j].IsDominateTraitOne;            arr[1].alliesOne = GenePool[j].IsDominateTraitTwo;
+		arr[0].alliesTwo = otherGenes->GenePool[j].IsDominateTraitOne;  arr[1].alliesTwo = otherGenes->GenePool[j].IsDominateTraitOne;
 
 //_____________________________________________________________________________________________________________________
 
-		arr[2].alliesOne = otherParentGenes[j].IsDominateTraitTwo;  arr[3].alliesOne = otherParentGenes[j].IsDominateTraitTwo;
-		arr[2].alliesTwo = Traits[j].IsDominateTraitOne;            arr[3].alliesTwo = Traits[j].IsDominateTraitTwo;
+		arr[2].alliesOne = otherGenes->GenePool[j].IsDominateTraitTwo;  arr[3].alliesOne = otherGenes->GenePool[j].IsDominateTraitTwo;
+		arr[2].alliesTwo = GenePool[j].IsDominateTraitOne;            arr[3].alliesTwo = GenePool[j].IsDominateTraitTwo;
 
 		RNG = FMath::RandRange(0, 3);
 
-		winningGen = arr[RNG];
+		winningAllies = arr[RNG];
 
-		_offSpring[j].IsDominateTraitOne = winningGen.alliesOne;
-		_offSpring[j].IsDominateTraitTwo = winningGen.alliesTwo;
+		_offSpring->GenePool[j].IsDominateTraitOne = winningAllies.alliesOne;
+		_offSpring->GenePool[j].IsDominateTraitTwo = winningAllies.alliesTwo;
 
-		_offSpring[j].Value = _offSpring[j].GetValue();
+		_offSpring->GenePool[j].Value = _offSpring->GenePool[j].GetValue();
 	}
 	//if(UGeneticCodingComponent* other = GetOwner()->FindComponentByClass<UGeneticCodingComponent>())
+
+	_offSpring->Name = (Name + " , " + otherGenes->Name);
 	return  true;
 }
 
@@ -95,27 +82,37 @@ void UGeneticCodingComponent::AddToManager()
 		_gameManager->GeneCodes.Add(this);
 	}
 }
+
 void UGeneticCodingComponent::Recreate()
 {
 	FVector Location = GetOwner()->GetActorTransform().GetLocation();
 	FRotator Rotation(0.0f, 0.0f, 0.0f);
 	FActorSpawnParameters SpawnInfo;
 
-	FTransform tranform = GetOwner()->GetTransform();
+	if (!_actorToSpawn)
+	{
+		FString DebugMessage = "Missing AGeneticCodingActor";
+		UE_LOG(LogTemp, Warning, TEXT("%s"), *DebugMessage);
+		return;
+	}
 
-	if (CanReproduce() && _actorToSpawn ) {
+	if (CanReproduce()) {
 
 		AGeneticCodingActor* MySpawnActor = SpawnObject(Location, Rotation);
 
 		UGeneticCodingComponent* TransferDNA = NewObject<UGeneticCodingComponent>(MySpawnActor,TEXT("GeneticCoding"));
+	
+		if (_gameManager)
+			TransferDNA->_gameManager = _gameManager;
 
 		//Keeps track of the new generations parent
 		TransferDNA->_parent = GetOwner();
+	
+		TransferDNA->GenePool = _offSpring->GenePool;
 
-		if(_gameManager)
-			TransferDNA->_gameManager = _gameManager;
-		
-		TransferDNA->Traits = _offSpring;
+		TransferDNA->Name = _offSpring->Name;
+
+		TransferDNA->_actorToSpawn = _actorToSpawn;
 
 		TransferDNA->RegisterComponent();
 
@@ -123,6 +120,7 @@ void UGeneticCodingComponent::Recreate()
 		AddToManager();
 	}
 }
+
 
 
 

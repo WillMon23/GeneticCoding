@@ -24,9 +24,9 @@ struct FTraitInfo {
 
 	UPROPERTY(EditAnywhere)
 	float ResessiveTraitValue = 0;
-	
+
 	UPROPERTY(EditAnywhere)
-		float Value;
+	float Value  = GetValue();
 
 	float GetValue() {
 		if (IsDominateTraitOne || IsDominateTraitTwo)
