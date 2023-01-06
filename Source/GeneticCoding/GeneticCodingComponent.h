@@ -52,33 +52,37 @@ private:
 	/// </summary>
 	void AddToManager();
 
-	UFUNCTION(CallInEditor)
 	/// <summary>
 	/// Once ready for recreate it'll spawn a new actor with a new genepool inherited 
 	/// </summary>
-	void Recreate();
+	void Recreate(FVector Location, FRotator Rotation);
+
+	/// <summary>
+	/// Sets the current stat of reproduction
+	/// </summary>
+	/// <param name="reproductionStat"></param>
+	void IsReadyToRepoduce( bool reproductionStat) { _readyToReproduce = reproductionStat; }
 
 public:
-	UPROPERTY(EditAnywhere)
-	TArray<FTraitInfo> GenePool;
-	
-	UPROPERTY(EditAnywhere)
-	bool ReadyToReproduce = false;
 
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<AGeneticCodingActor> _actorToSpawn;
-
-	UPROPERTY(EditAnywhere)
-	class UGeneticCodingGameManager* _gameManager;
-
-	UPROPERTY(EditAnywhere)
-	int RNG = 0;
-
-	UPROPERTY(EditAnywhere)
-	FString Name;
 
 
 private:
+	UPROPERTY(EditAnywhere)
+		TArray<FTraitInfo> _genePool;
+
+	UPROPERTY(EditAnywhere)
+		bool _readyToReproduce = false;
+
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<AGeneticCodingActor> _actorToSpawn;
+
+	UPROPERTY(EditAnywhere)
+		class UGeneticCodingGameManager* _gameManager;
+
+
+	UPROPERTY(EditAnywhere)
+		FString Name;
 	UGeneticCodingComponent* _offSpring;
 	AActor* _parent;
 
