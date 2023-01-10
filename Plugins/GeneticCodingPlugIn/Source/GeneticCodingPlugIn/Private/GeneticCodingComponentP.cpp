@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "GeneticCodingGameManagerP.h"
 #include "GeneticCodingComponentP.h"
+#include "GeneticCodingGameManagerP.h"
 #include "GeneticCodingActorP.h"
 
 // Sets default values for this component's properties
