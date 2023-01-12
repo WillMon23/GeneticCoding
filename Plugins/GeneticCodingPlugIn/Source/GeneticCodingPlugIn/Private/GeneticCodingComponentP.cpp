@@ -23,9 +23,27 @@ AGeneticCodingActorP* UGeneticCodingComponentP::SpawnObject(FVector location, FR
 	FActorSpawnParameters SpawnParams;
 
 	//Takes the refrence GeneticCodeActer being passed in through actorToSpawn
-	AGeneticCodingActorP* SpawnedActorRef = GetWorld()->SpawnActor<AGeneticCodingActorP>(_actorToSpawn, location, rotation, SpawnParams);
+	AGeneticCodingActorP* SpawnedActorRef = GetWorld()->SpawnActor<AGeneticCodingActorP>(ActorToSpawn, location, rotation, SpawnParams);
 
 	return SpawnedActorRef;
+}
+
+void UGeneticCodingComponentP::SetVariables()
+{
+}
+
+float UGeneticCodingComponentP::AddToGenePool(FString name, bool traitsDomOne, bool traitsDomTwo, float domineteTrait, float resessiveTrait)
+{
+	FGeneticCodingTraitInfoP Trait = FGeneticCodingTraitInfoP();
+	Trait.TraitsName = name;
+
+	Trait.IsDominateTraitOne = traitsDomOne;
+	Trait.IsDominateTraitTwo = traitsDomTwo;
+
+	Trait.DominateTraitValue = domineteTrait;
+	Trait.ResessiveTraitValue = resessiveTrait;
+	GenePool.Add(Trait);
+	return Trait.GetValue();
 }
 
 /// <summary>
@@ -33,7 +51,7 @@ AGeneticCodingActorP* UGeneticCodingComponentP::SpawnObject(FVector location, FR
 /// based on the trait info provided 
 /// </summary>
 /// <returns>returns true If the inheritance passed perfectly</returns>
-bool UGeneticCodingComponentP::CanReproduce()
+bool UGeneticCodingComponentP::CanSelfReproduce()
 {
 	return  CanReproduce(this);
 }
@@ -59,31 +77,31 @@ bool UGeneticCodingComponentP::CanReproduce(UGeneticCodingComponentP* otherGenes
 	//Creates a new offspring to make to preping to inherite new genes 
 	_offSpring = NewObject<UGeneticCodingComponentP>();
 
-	_offSpring->_genePool.SetNum(_genePool.Num());
+	_offSpring->GenePool.SetNum(GenePool.Num());
 
-	for (int j = 0; j < _genePool.Num(); j++) {
+	for (int j = 0; j < GenePool.Num(); j++) {
 
 		//If the name dose not match 
-		if (_genePool[j].TraitsName != otherGenes->_genePool[j].TraitsName)
+		if (GenePool[j].TraitsName != otherGenes->GenePool[j].TraitsName)
 		{
 			//Will insted take the perants gene ins
-			_offSpring->_genePool[j] = _genePool[j];
-			_offSpring->_genePool.Add(otherGenes->_genePool[j]);
+			_offSpring->GenePool[j] = GenePool[j];
+			_offSpring->GenePool.Add(otherGenes->GenePool[j]);
 			continue;
 		}
-		_offSpring->_genePool[j] = _genePool[j];
+		_offSpring->GenePool[j] = GenePool[j];
 
 		//Sets all the possible combination in a chart 
 		//Recreating mondels law of inheritance chart
 
 																			/* | */
-		arr[0].alliesOne = _genePool[j].IsDominateTraitOne;					/* | */        arr[1].alliesOne = _genePool[j].IsDominateTraitTwo;
-		arr[0].alliesTwo = otherGenes->_genePool[j].IsDominateTraitOne;		/* | */        arr[1].alliesTwo = otherGenes->_genePool[j].IsDominateTraitOne;
+		arr[0].alliesOne = GenePool[j].IsDominateTraitOne;					/* | */        arr[1].alliesOne = GenePool[j].IsDominateTraitTwo;
+		arr[0].alliesTwo = otherGenes->GenePool[j].IsDominateTraitOne;		/* | */        arr[1].alliesTwo = otherGenes->GenePool[j].IsDominateTraitOne;
 		/* | */
 //_____________________________________________________________________________|___________________________________________________________________________________
 																			/* | */
-		arr[2].alliesOne = otherGenes->_genePool[j].IsDominateTraitTwo;		/* | */			arr[3].alliesOne = otherGenes->_genePool[j].IsDominateTraitTwo;
-		arr[2].alliesTwo = _genePool[j].IsDominateTraitOne;					/* | */			arr[3].alliesTwo = _genePool[j].IsDominateTraitTwo;
+		arr[2].alliesOne = otherGenes->GenePool[j].IsDominateTraitTwo;		/* | */			arr[3].alliesOne = otherGenes->GenePool[j].IsDominateTraitTwo;
+		arr[2].alliesTwo = GenePool[j].IsDominateTraitOne;					/* | */			arr[3].alliesTwo = GenePool[j].IsDominateTraitTwo;
 		/* | */
 
 //Gets a random value between 0 and 3 to choose from the 4 spots in the cantainer
@@ -91,10 +109,8 @@ bool UGeneticCodingComponentP::CanReproduce(UGeneticCodingComponentP* otherGenes
 
 		winningAllies = arr[RNG];
 
-		_offSpring->_genePool[j].IsDominateTraitOne = winningAllies.alliesOne;
-		_offSpring->_genePool[j].IsDominateTraitTwo = winningAllies.alliesTwo;
-
-		_offSpring->_genePool[j].Value = _offSpring->_genePool[j].GetValue();
+		_offSpring->GenePool[j].IsDominateTraitOne = winningAllies.alliesOne;
+		_offSpring->GenePool[j].IsDominateTraitTwo = winningAllies.alliesTwo;
 	}
 
 	_offSpring->Name = (Name + " , " + otherGenes->Name);
@@ -123,14 +139,14 @@ void UGeneticCodingComponentP::AddToManager()
 void UGeneticCodingComponentP::Recreate(FVector location, FRotator rotation)
 {
 	//Lets user know they need to add a AGeneticCodingActor
-	if (!_actorToSpawn)
+	if (!ActorToSpawn)
 	{
 		FString DebugMessage = "Missing AGeneticCodingActor";
 		UE_LOG(LogTemp, Warning, TEXT("%s"), *DebugMessage);
 		return;
 	}
 
-	if (CanReproduce()) {
+	if (CanSelfReproduce()) {
 
 		AGeneticCodingActorP* MySpawnActor = SpawnObject(location, rotation);
 
@@ -142,13 +158,13 @@ void UGeneticCodingComponentP::Recreate(FVector location, FRotator rotation)
 		//Keeps track of the new generations parent
 		TransferDNA->_parent = GetOwner();
 		//Sets it's new gene pool
-		TransferDNA->_genePool = _offSpring->_genePool;
+		TransferDNA->GenePool = _offSpring->GenePool;
 
 		//Sets nre name to there geneticCode component
 		TransferDNA->Name = _offSpring->Name;
 
 		//Sets bp to be that of this one 
-		TransferDNA->_actorToSpawn = _actorToSpawn;
+		TransferDNA->ActorToSpawn = ActorToSpawn;
 
 
 		TransferDNA->RegisterComponent();

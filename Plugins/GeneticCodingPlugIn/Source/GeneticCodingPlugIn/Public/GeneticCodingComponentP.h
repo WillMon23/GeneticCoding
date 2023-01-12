@@ -20,9 +20,12 @@ class GENETICCODINGPLUGIN_API UGeneticCodingComponentP : public UActorComponent
 	GENERATED_BODY()
 
 public:	
-	// Sets default values for this component's properties
+	/// <summary>
+	/// Sets default values for this component's properties
+	/// </summary>
 	UGeneticCodingComponentP();
 
+	UFUNCTION(BlueprintCallable)
 	/// <summary>
 	/// Spawns the object with a position and a direction/rotation
 	/// </summary>
@@ -30,14 +33,22 @@ public:
 	/// <param name="rotation">direction is spawns in</param>
 	/// <returns>New object spawned refrenced from AGeneticCodingActor</returns>
 	AGeneticCodingActorP* SpawnObject(FVector location, FRotator rotation);
-private:
+
+	UFUNCTION(BlueprintCallable)
+	virtual void SetVariables();
+
+	UFUNCTION(BlueprintCallable)
+	float AddToGenePool(FString name, bool traitsDomOne, bool traitsDomTwo, float domineteTrait, float resessiveTrait);
+
+	UFUNCTION(BlueprintCallable)
 	/// <summary>
 	/// Takes it's self recreates it with a new set of traits inherited by it's own traits 
 	/// based on the trait info provided 
 	/// </summary>
 	/// <returns>returns true If the inheritance passed perfectly</returns>
-	bool CanReproduce();
+	bool CanSelfReproduce();
 
+	UFUNCTION(BlueprintCallable)
 	/// <summary>
 	/// Takes Takes some other genes then recreates a new set of traits inherited by it's own traits 
 	/// based on the trait info provided
@@ -47,16 +58,19 @@ private:
 	/// <returns>returns true If the inheritance passed perfectly</returns>
 	bool CanReproduce(UGeneticCodingComponentP* otherGenes);
 
+	UFUNCTION(BlueprintCallable)
 	/// <summary>
 	/// Updates the data asset attached to this component 
 	/// </summary>
 	void AddToManager();
 
+	UFUNCTION(BlueprintCallable)
 	/// <summary>
 	/// Once ready for recreate it'll spawn a new actor with a new genepool inherited 
 	/// </summary>
 	void Recreate(FVector Location, FRotator Rotation);
 
+	UFUNCTION(BlueprintCallable)
 	/// <summary>
 	/// Sets the current stat of reproduction
 	/// </summary>
@@ -64,24 +78,22 @@ private:
 	void IsReadyToRepoduce(bool reproductionStat) { _readyToReproduce = reproductionStat; }
 
 public:
-
-
-
-private:
 	UPROPERTY(EditAnywhere)
-		TArray<FGeneticCodingTraitInfoP> _genePool;
+	TArray<FGeneticCodingTraitInfoP> GenePool;
+
+	UPROPERTY(EditAnywhere)
+		FString Name;
+
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<AGeneticCodingActorP> ActorToSpawn;
+private:
+	
 
 	UPROPERTY(EditAnywhere)
 		bool _readyToReproduce = false;
 
 	UPROPERTY(EditAnywhere)
-		TSubclassOf<AGeneticCodingActorP> _actorToSpawn;
-
-	UPROPERTY(EditAnywhere)
 		class UGeneticCodingGameManagerP* _gameManager;
-
-	UPROPERTY(EditAnywhere)
-		FString Name;
 
 	UGeneticCodingComponentP* _offSpring;
 	AActor* _parent;

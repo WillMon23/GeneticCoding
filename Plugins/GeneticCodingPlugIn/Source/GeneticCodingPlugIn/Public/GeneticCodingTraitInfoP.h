@@ -29,9 +29,6 @@ struct GENETICCODINGPLUGIN_API FGeneticCodingTraitInfoP
 	UPROPERTY(EditAnywhere)
 		float ResessiveTraitValue = 0;
 
-	UPROPERTY(EditAnywhere)
-		float Value = GetValue();
-
 	float GetValue() {
 		if (IsDominateTraitOne || IsDominateTraitTwo)
 			return DominateTraitValue;
