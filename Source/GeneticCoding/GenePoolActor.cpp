@@ -3,3 +3,11 @@
 
 #include "GenePoolActor.h"
 
+void AGenePoolActor::BeginPlay()
+{
+}
+
+void AGenePoolActor::Tick(float deltaTime)
+{
+}
+

@@ -40,13 +40,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	float AddToGenePool(FString name, bool traitsDomOne, bool traitsDomTwo, float domineteTrait, float resessiveTrait);
 
-	UFUNCTION(BlueprintCallable)
 	/// <summary>
 	/// Takes it's self recreates it with a new set of traits inherited by it's own traits 
 	/// based on the trait info provided 
 	/// </summary>
 	/// <returns>returns true If the inheritance passed perfectly</returns>
-	bool CanSelfReproduce();
+	bool CanReproduce();
 
 	UFUNCTION(BlueprintCallable)
 	/// <summary>

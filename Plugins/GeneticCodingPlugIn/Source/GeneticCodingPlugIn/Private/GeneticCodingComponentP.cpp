@@ -51,7 +51,7 @@ float UGeneticCodingComponentP::AddToGenePool(FString name, bool traitsDomOne, b
 /// based on the trait info provided 
 /// </summary>
 /// <returns>returns true If the inheritance passed perfectly</returns>
-bool UGeneticCodingComponentP::CanSelfReproduce()
+bool UGeneticCodingComponentP::CanReproduce()
 {
 	return  CanReproduce(this);
 }
@@ -146,30 +146,37 @@ void UGeneticCodingComponentP::Recreate(FVector location, FRotator rotation)
 		return;
 	}
 
-	if (CanSelfReproduce()) {
 
-		AGeneticCodingActorP* MySpawnActor = SpawnObject(location, rotation);
+	AGeneticCodingActorP* MySpawnActor = SpawnObject(location, rotation);
 
-		UGeneticCodingComponentP* TransferDNA = NewObject<UGeneticCodingComponentP>(MySpawnActor, TEXT("GeneticCoding"));
+	UGeneticCodingComponentP* TransferDNA = NewObject<UGeneticCodingComponentP>(MySpawnActor, TEXT("GeneticCoding"));
 
-		if (_gameManager)
-			TransferDNA->_gameManager = _gameManager;
+	if (_gameManager)
+		TransferDNA->_gameManager = _gameManager;
 
-		//Keeps track of the new generations parent
-		TransferDNA->_parent = GetOwner();
-		//Sets it's new gene pool
-		TransferDNA->GenePool = _offSpring->GenePool;
+	AActor* MyActorDefaultObject = ActorToSpawn.GetDefaultObject();
+	
+	if (UGeneticCodingComponentP* curremtGenes = MyActorDefaultObject->FindComponentByClass<UGeneticCodingComponentP>())
+		curremtGenes = TransferDNA;
 
-		//Sets nre name to there geneticCode component
-		TransferDNA->Name = _offSpring->Name;
+	//Keeps track of the new generations parent
+	TransferDNA->_parent = GetOwner();
+	//Sets it's new gene pool
+	TransferDNA->GenePool = _offSpring->GenePool;
 
-		//Sets bp to be that of this one 
-		TransferDNA->ActorToSpawn = ActorToSpawn;
+	//Sets nre name to there geneticCode component
+	TransferDNA->Name = _offSpring->Name;
+
+	//Sets bp to be that of this one 
+	TransferDNA->ActorToSpawn = ActorToSpawn;
 
 
-		TransferDNA->RegisterComponent();
+	TransferDNA->RegisterComponent();
 
+	if (UGeneticCodingComponentP* curremtGenes = MyActorDefaultObject->FindComponentByClass<UGeneticCodingComponentP>())
+		curremtGenes = TransferDNA;
+	else 
 		MySpawnActor->AddInstanceComponent(TransferDNA);
-		AddToManager();
-	}
+
+	AddToManager();
 }

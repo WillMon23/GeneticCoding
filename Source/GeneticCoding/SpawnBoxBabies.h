@@ -15,5 +15,10 @@ class GENETICCODING_API USpawnBoxBabies : public UGeneticCodingComponentP
 	GENERATED_BODY()
 	
 public:
-	void SetVariables() override;
+
+	// Called when the game starts or when spawned
+	void BeginPlay() override;
+public:
+
+
 };

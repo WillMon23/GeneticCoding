@@ -2,6 +2,7 @@
 
 
 #include "SpawnBoxBabies.h"
-void USpawnBoxBabies::SetVariables() {
-	
+void USpawnBoxBabies::BeginPlay()
+{
+	AddToGenePool("Name", true, false, 100.0f, 0.5f);
 }

@@ -13,4 +13,7 @@ UCLASS()
 class GENETICCODING_API AGenePoolActor : public AGeneticCodingActorP
 {
 	GENERATED_BODY()
+
+		void BeginPlay() override;
+	void Tick(float deltaTime) override;
 };
